@@ -1,17 +1,11 @@
-from flask import Flask, Blueprint
-from flask_restful import  Api
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate 
+from flask import Blueprint
+from flask_restful import Api
 
 # 引入视图函数
-from opskit_api.resources.api.helloworld import HelloWorld 
-from opskit_api.resources.auth.login import Login 
-
-app = Flask(__name__)
-app.config.from_pyfile("config.cfg")
-
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+from opskit_api.resources.api.helloworld import HelloWorld
+from opskit_api.resources.auth.login import Login
+from opskit_api.resources.auth.register import Register
+from opskit_api.models import app, User, Note, db, migrate
 
 #api blueprint
 api_bp = Blueprint('api', __name__)
@@ -28,6 +22,7 @@ auth_bp = Blueprint('auth', __name__)
 auth_resource = Api(auth_bp, catch_all_404s=True)
 
 auth_resource.add_resource(Login, '/login')
+auth_resource.add_resource(Register, '/register')
 
 # 注册蓝图
 app.register_blueprint(auth_bp, url_prefix='/auth')
