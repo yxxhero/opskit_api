@@ -2,10 +2,12 @@ import datetime
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate 
+from flask_redis import FlaskRedis
 
 app = Flask(__name__)
 app.config.from_pyfile("config.cfg")
 db = SQLAlchemy(app)
+redis_store = FlaskRedis(app)
 migrate = Migrate(app, db)
 
 # model
