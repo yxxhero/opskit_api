@@ -3,7 +3,7 @@ from flask_restful import reqparse
 from opskit_api.common.login_helper import checkuserpasswd
 from opskit_api.common.login_helper import jwt_encode_token 
 from opskit_api.common.paasswordmd5 import md5passwd  
-from opskit_api.models import redis_store 
+from opskit_api.models import redis_store, app 
 
 class Login(Resource):
     def post(self):
@@ -14,7 +14,7 @@ class Login(Resource):
         try:
             if checkuserpasswd(args.username, md5passwd(args.password)):
                 authtoken = jwt_encode_token(args.username)
-                redis_store.set(args.username, authtoken)
+                redis_store.set(args.username, authtoken, app.config.get('TOKEN_DEADLINE', 60))
                 return {"code": 0, 'token': authtoken}
             else:
                 return {"code": 1, 'message': '用户名或密码错误!!!'}

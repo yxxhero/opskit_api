@@ -1,6 +1,6 @@
 from flask_restful import Resource
 from flask_restful import reqparse
-from flask import request
+from flask import request, g
 from opskit_api.common.login_helper import auth_decorator 
 from opskit_api.common.login_helper import jwt_decode_token 
 
@@ -21,5 +21,6 @@ class Essay(Resource):
         parser.add_argument('title', type=str, required=True)
         parser.add_argument('content', type=str, required=True) 
         print(parser.parse_args())
+        print(g.username)
         print(jwt_decode_token(request.headers['Authorization']))
         return {'code': 200, 'msg': "请求成功", 'data': []}

@@ -2,6 +2,7 @@ from opskit_api.models import User, app, redis_store
 from flask import request, g
 from functools import wraps
 import time, datetime 
+from jwt.exceptions import InvalidTokenError, ExpiredSignatureError
 import jwt
 
 def checkuserpasswd(username, password):
@@ -13,7 +14,7 @@ def checkuserpasswd(username, password):
 def jwt_encode_token(username):
     login_time = time.time()
     payload = {
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=60),
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=app.config.get('TOKEN_DEADLINE', 60)),
         'iat': datetime.datetime.utcnow(),
         'iss': 'ken',
         'data': {
@@ -30,8 +31,7 @@ def jwt_encode_token(username):
 def jwt_decode_token(jwttoken):
     return jwt.decode(
                 jwttoken,
-                app.config['SECRET_KEY'],
-                options={'verify_exp': False}
+                app.config['SECRET_KEY']
             )
 
 def auth_decorator(func):
@@ -47,6 +47,10 @@ def auth_decorator(func):
                 else:
                     g.username = username
                     return func(*args, **kwargs)
+            except ExpiredSignatureError as expiredtokenerror:
+                return {'code': 403, 'message': 'token已过期'}, 403
+            except InvalidTokenError as invaildtokenerror:
+                return {'code': 403, 'message': 'token不可用'}, 403
             except Exception as e:
                 return {'code': 403, 'message': 'token解析异常', 'data': str(e)}, 403
     return wrapper
