@@ -15,9 +15,8 @@ class Login(Resource):
             if checkuserpasswd(args.username, md5passwd(args.password)):
                 authtoken = jwt_encode_token(args.username)
                 redis_store.set(args.username, authtoken, app.config.get('TOKEN_DEADLINE', 60))
-                return {"code": 0, 'token': authtoken}
+                return {"code": 0, 'token': authtoken, 'username': args.username}
             else:
                 return {"code": 1, 'message': '用户名或密码错误!!!'}
         except Exception as e:
-            # raise e
             return {"code": 1, 'message': str(e)}
