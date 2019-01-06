@@ -1,5 +1,6 @@
 from flask import Blueprint, request
 from flask_restful import Api
+from flask_cors import CORS
 
 # 引入视图函数
 from opskit_api.resources.api.essay import Essay
@@ -16,6 +17,7 @@ api_resource = Api(api_bp, catch_all_404s=True)
 api_resource.add_resource(Essay, '/note')
 
 
+CORS(app)
 # auth blueprint
 auth_bp = Blueprint('auth', __name__)
 

@@ -13,6 +13,11 @@ def checkuserpasswd(username, password):
     else:
         return False
 
+def checkuserexist(username):
+    if User.query.filter_by(user_name=username).count():
+        return True
+    else:
+        return False
 
 def jwt_encode_token(username):
     login_time = time.time()
