@@ -9,6 +9,8 @@ from opskit_api.resources.auth.logout import Logout
 from opskit_api.resources.auth.register import Register
 from opskit_api.models import app, User, Note, db, migrate
 
+CORS(app)
+
 # api blueprint
 api_bp = Blueprint('api', __name__)
 
@@ -17,7 +19,6 @@ api_resource = Api(api_bp, catch_all_404s=True)
 api_resource.add_resource(Essay, '/note')
 
 
-CORS(app)
 # auth blueprint
 auth_bp = Blueprint('auth', __name__)
 
