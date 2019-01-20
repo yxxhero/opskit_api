@@ -6,6 +6,7 @@ from opskit_api.models import User, db
 
 class Register(Resource):
     def __init__(self):
+        super().__init__()
         self.parser = reqparse.RequestParser(bundle_errors=True)
 
     def post(self):

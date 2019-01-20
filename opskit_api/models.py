@@ -40,8 +40,14 @@ class Note(db.Model):
 class User(db.Model):
     __tablename__ = "user"
 
+    USER_ROLES = [
+        ('vip', 'Vip'),
+        ('common', 'Common'),
+    ]
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_name = db.Column(db.String(100), unique=True)
     user_password = db.Column(db.String(100))
     user_email = db.Column(db.String(512))
+    user_role = db.Column(ChoiceType(USER_ROLES, impl=db.String()), default='vip')
     note = db.relationship('Note', backref='user', lazy=True)

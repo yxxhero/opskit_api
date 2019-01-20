@@ -9,7 +9,7 @@ from opskit_api.models import redis_store, app
 
 class Login(Resource):
     def __init__(self):
-
+        super().__init__()
         self.parser = reqparse.RequestParser(bundle_errors=True)
 
     def post(self):

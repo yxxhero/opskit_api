@@ -4,12 +4,14 @@ from flask_cors import CORS
 
 # 引入视图函数
 from opskit_api.resources.api.essay import Essay
+from opskit_api.resources.api.upload import Upload 
 from opskit_api.resources.auth.login import Login
 from opskit_api.resources.auth.logout import Logout
 from opskit_api.resources.auth.register import Register
-from opskit_api.models import app, User, Note, db, migrate
+from opskit_api.models import app, Note, db, migrate
 
 CORS(app)
+print(app.config)
 
 # api blueprint
 api_bp = Blueprint('api', __name__)
@@ -17,6 +19,7 @@ api_bp = Blueprint('api', __name__)
 api_resource = Api(api_bp, catch_all_404s=True)
 
 api_resource.add_resource(Essay, '/note')
+api_resource.add_resource(Upload, '/upload')
 
 
 # auth blueprint
