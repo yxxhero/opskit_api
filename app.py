@@ -11,7 +11,6 @@ from opskit_api.resources.auth.register import Register
 from opskit_api.models import app, Note, db, migrate
 
 CORS(app)
-print(app.config)
 
 # api blueprint
 api_bp = Blueprint('api', __name__)

@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from sqlalchemy_utils.types.choice import ChoiceType
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
@@ -30,11 +30,23 @@ class Note(db.Model):
     note_type = db.Column(ChoiceType(NOTE_TYPES, impl=db.Integer()))
     userId = db.Column(db.Integer, db.ForeignKey('user.id'))
     create_time = db.Column(db.DateTime)
+    user = db.relationship(
+        'User', backref=db.backref('note_set', lazy='dynamic'))
 
-    def __init__(self, title, content):
+    def __init__(self, title, content, note_type):
+
+        super().__init__()
+        self.note_type = note_type
         self.title = title
         self.content = content
         self.create_time = datetime.utcnow()
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def update(self):
+        db.session.commit()
 
 
 class User(db.Model):
@@ -50,4 +62,20 @@ class User(db.Model):
     user_password = db.Column(db.String(100))
     user_email = db.Column(db.String(512))
     user_role = db.Column(ChoiceType(USER_ROLES, impl=db.Integer()), default=1)
-    note = db.relationship('Note', backref='user', lazy=True)
+    create_time = db.Column(db.DateTime)
+
+    def __init__(self, user_name, user_password, user_email, user_role=1):
+
+        super().__init__()
+        self.user_name = user_name
+        self.user_password = user_password
+        self.user_email = user_email
+        self.user_role = user_role
+        self.create_time = datetime.utcnow()
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def update(self):
+        db.session.commit()
