@@ -1,11 +1,14 @@
 import os
-from flask import request
+import traceback
+import time
+from flask import request, g, current_app
 from flask_restful import Resource
 from flask_restful import reqparse
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
 from opskit_api.common.login_helper import auth_decorator, jwt_decode_token
 from opskit_api.common.upload_helper import allowed_file, ensure_userdir_exist
+from opskit_api.common.paasswordmd5 import md5passwd
 from opskit_api.models import app
 
 
@@ -22,15 +25,17 @@ class Upload(Resource):
             'file', type=FileStorage, location='files', required=True)
         args = self.parser.parse_args()
         if not allowed_file(args.file.filename):
-            return {'code': 403, 'msg': "文件名不合法"}
+            return {'code': 1, 'msg': "文件名不合法"}
         try:
             filename = secure_filename(args.file.filename)
-            username = jwt_decode_token(request.headers.get('Authorization'))[
-                'data']['username']
+            md5_value = md5passwd(filename + str(time.time())) 
+            md5_filename = md5_value + '.' + filename.split('.')[1]
+            username = g.username
             file_dir = os.path.join(app.config['UPLOAD_FOLDER'], username)
             ensure_userdir_exist(file_dir)
-            args.file.save(os.path.join(file_dir, filename))
+            args.file.save(os.path.join(file_dir, md5_filename))
         except Exception as e:
+            current_app.logger.error(traceback.format_exc())
             return {'code': 1, 'msg': str(e)}
         else:
-            return {'code': 0, 'msg': "上传文件成功"}
+            return {'code': 0, 'url': 'http://192.168.19.130'+ os.path.join('/uploads/', username, md5_filename),  'msg': "上传文件成功"}

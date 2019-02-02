@@ -1,8 +1,9 @@
 from opskit_api.models import User, app, redis_store
-from flask import request, g
+from flask import request, g, current_app
 from functools import wraps
 import time
 import datetime
+import traceback
 from jwt.exceptions import InvalidTokenError, ExpiredSignatureError
 import jwt
 
@@ -13,11 +14,13 @@ def checkuserpasswd(username, password):
     else:
         return False
 
+
 def checkuserexist(username):
     if User.query.filter_by(user_name=username).count():
         return True
     else:
         return False
+
 
 def jwt_encode_token(username):
     login_time = time.time()
@@ -48,20 +51,22 @@ def auth_decorator(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         if 'Authorization' not in request.headers:
-            return {'code': 403, 'message': '未认证'}, 403
+            return {'code': 401, 'message': '未认证'}, 401
         else:
             try:
-                username = jwt_decode_token(request.headers.get('Authorization'))[
-                    'data']['username']
+                username = jwt_decode_token(request.headers.get('Authorization'))['data']['username']
                 if redis_store.get(username).decode('utf-8') != request.headers.get('Authorization'):
-                    return {'code': 403, 'message': 'token失效'}, 403
+                    return {'code': 401, 'message': 'token失效'}, 401
                 else:
                     g.username = username
                     return func(*args, **kwargs)
-            except ExpiredSignatureError as expiredtokenerror:
-                return {'code': 403, 'message': 'token已过期'}, 403
-            except InvalidTokenError as invaildtokenerror:
-                return {'code': 403, 'message': 'token不可用'}, 403
+            except ExpiredSignatureError:
+                current_app.logger.error(traceback.format_exc())
+                return {'code': 401, 'message': 'token已过期'}, 401
+            except InvalidTokenError:
+                current_app.logger.error(traceback.format_exc())
+                return {'code': 401, 'message': 'token不可用'}, 401
             except Exception as e:
-                return {'code': 403, 'message': 'token解析异常', 'data': str(e)}, 403
+                current_app.logger.error(traceback.format_exc())
+                return {'code': 401, 'message': 'token解析异常', 'data': str(e)}, 401
     return wrapper

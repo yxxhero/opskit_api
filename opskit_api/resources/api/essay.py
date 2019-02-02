@@ -1,9 +1,9 @@
 from flask_restful import Resource
 from flask_restful import reqparse
-from flask import request
+from flask import g, current_app
 from opskit_api.models import Note, User
+import traceback
 from opskit_api.common.login_helper import auth_decorator
-from opskit_api.common.login_helper import jwt_decode_token
 
 
 class Essay(Resource):
@@ -19,18 +19,18 @@ class Essay(Resource):
         self.parser.add_argument(
             'page_size', type=int, default=10, location='args')
         self.parser.add_argument('username', type=str,
-                                 default="all", location='args')
+                                 default=None, location='args')
         self.parser.add_argument('note_type', type=str,
-                                 default="web", location='args')
+                                 default=None, location='args')
         args = self.parser.parse_args()
-        print(args)
         try:
-            note_list = Note.query.limit(args.page_size).offset(args.page_size * (args.page - 1)).all()
+            note_list = Note.query.limit(args.page_size).offset(
+                args.page_size * (args.page - 1)).all()
         except Exception as e:
+            current_app.logger.error(traceback.format_exc())
             return {'code': 1, 'msg': str(e)}
         else:
-            return {'code': 0, 'msg': "请求成功", 'data': []}
-            
+            return {'code': 0, 'msg': "请求成功", 'data': [{'content': item.content, 'note_type': item.note_type.value} for item in note_list]}
 
     def post(self):
         self.parser.add_argument(
@@ -38,17 +38,17 @@ class Essay(Resource):
         self.parser.add_argument(
             'content', type=str, required=True, location='json')
         self.parser.add_argument(
-            'note_type', type=str, required=True, location='json')
-        username = jwt_decode_token(request.headers.get('Authorization'))['data']['username']
+            'raw_content', type=str, required=True, location='json')
+        self.parser.add_argument(
+            'note_type', type=int, required=True, location='json')
+        args = self.parser.parse_args()
+        username = g.username
         try:
-            user = User.query.filter(user_name=username).first()  
-            Note(title=args.title, content=args.content, note_type=args.note_type, user=user).save()
+            user = User.query.filter_by(user_name=username).first()
+            args.user = user
+            Note(**args).save()
         except Exception as e:
+            current_app.logger.error(traceback.format_exc())
             return {'code': 1, 'msg': str(e)}
         else:
             return {'code': 0, 'msg': "提交成功"}
-
-
-         
-
-        return {'code': 200, 'msg': "请求成功", 'data': []}

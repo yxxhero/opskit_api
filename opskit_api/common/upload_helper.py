@@ -7,4 +7,4 @@ def allowed_file(filename):
 
 
 def ensure_userdir_exist(userdir):
-    os.makedirs(userdir)
+    os.makedirs(userdir, exist_ok=True)
