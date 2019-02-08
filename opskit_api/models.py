@@ -31,6 +31,7 @@ class Note(db.Model):
     note_type = db.Column(ChoiceType(NOTE_TYPES, impl=db.Integer()))
     userId = db.Column(db.Integer, db.ForeignKey('user.id'))
     create_time = db.Column(db.DateTime)
+    update_time = db.Column(db.DateTime)
     user = db.relationship(
         'User', backref=db.backref('note_set', lazy='dynamic'))
 
@@ -43,6 +44,7 @@ class Note(db.Model):
         self.content = content
         self.raw_content = raw_content
         self.create_time = datetime.utcnow()
+        self.update_time = datetime.utcnow()
 
     def save(self):
         db.session.add(self)

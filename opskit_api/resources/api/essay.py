@@ -15,22 +15,28 @@ class Essay(Resource):
         self.parser = reqparse.RequestParser(bundle_errors=True)
 
     def get(self):
-        self.parser.add_argument('page', type=int, default=1, location='args')
-        self.parser.add_argument(
-            'page_size', type=int, default=10, location='args')
-        self.parser.add_argument('username', type=str,
-                                 default=None, location='args')
-        self.parser.add_argument('note_type', type=str,
+        self.parser.add_argument('id', type=str,
                                  default=None, location='args')
         args = self.parser.parse_args()
         try:
-            note_list = Note.query.limit(args.page_size).offset(
-                args.page_size * (args.page - 1)).all()
+            note_ins = Note.query.filter_by(id=args.id).first()
+            if note_ins:
+                note_info = {
+                    "title": note_ins.title,
+                    "content": note_ins.content,
+                    "raw_content": note_ins.raw_content,
+                    "username": note_ins.user.user_name,
+                    "useravatar": note_ins.user.user_avatar,
+                    "createtime": note_ins.create_time,
+                    "updatetime": note_ins.update_time
+                }
+            else:
+                return {'code': 1, 'msg': "文章不存在"}
         except Exception as e:
             current_app.logger.error(traceback.format_exc())
-            return {'code': 1, 'msg': str(e)}
+            return {'code': 1, 'msg': '获取文章信息异常'}
         else:
-            return {'code': 0, 'msg': "请求成功", 'data': [{'content': item.content, 'note_type': item.note_type.value} for item in note_list]}
+            return {'code': 0, 'msg': "请求成功", 'data': note_info}
 
     def post(self):
         self.parser.add_argument(

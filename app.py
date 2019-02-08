@@ -4,6 +4,7 @@ from flask_cors import CORS
 import logging
 
 # 引入视图函数
+from opskit_api.resources.api.essays import Essays
 from opskit_api.resources.api.essay import Essay
 from opskit_api.resources.api.upload import Upload
 from opskit_api.resources.auth.login import Login
@@ -18,6 +19,7 @@ api_bp = Blueprint('api', __name__)
 
 api_resource = Api(api_bp, catch_all_404s=True)
 
+api_resource.add_resource(Essays, '/notes')
 api_resource.add_resource(Essay, '/note')
 api_resource.add_resource(Upload, '/upload')
 
@@ -32,8 +34,6 @@ auth_resource.add_resource(Logout, '/logout')
 auth_resource.add_resource(Register, '/register')
 
 # 拦截请求
-
-
 @app.before_request
 def handle_token():
     pass
