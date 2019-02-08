@@ -24,12 +24,15 @@ class Essay(Resource):
                 note_info = {
                     "title": note_ins.title,
                     "content": note_ins.content,
+                    "view_count": note_ins.view_count,
                     "raw_content": note_ins.raw_content,
                     "username": note_ins.user.user_name,
                     "useravatar": note_ins.user.user_avatar,
                     "createtime": note_ins.create_time,
                     "updatetime": note_ins.update_time
                 }
+                note_ins.view_count += 1
+                note_ins.update()
             else:
                 return {'code': 1, 'msg': "文章不存在"}
         except Exception as e:

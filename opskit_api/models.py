@@ -25,6 +25,7 @@ class Note(db.Model):
     ]
 
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
+    view_count = db.Column(db.Integer, default=0)
     title = db.Column(db.String(256))
     content = db.Column(db.Text)
     raw_content = db.Column(db.Text)
@@ -35,13 +36,14 @@ class Note(db.Model):
     user = db.relationship(
         'User', backref=db.backref('note_set', lazy='dynamic'))
 
-    def __init__(self, title, content, raw_content, note_type, user):
+    def __init__(self, title, content, raw_content, note_type, user, view_count=0):
 
         super().__init__()
         self.note_type = note_type
         self.title = title
         self.user = user
         self.content = content
+        self.view_count = view_count 
         self.raw_content = raw_content
         self.create_time = datetime.utcnow()
         self.update_time = datetime.utcnow()

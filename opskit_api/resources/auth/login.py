@@ -20,7 +20,7 @@ class Login(Resource):
         args = self.parser.parse_args()
         try:
             if not checkuserexist(args.username):
-                return {"code": 1, 'message': '用户名不存在!!!'}
+                return {"code": 1, 'msg': '用户名不存在!!!'}
 
             if checkuserpasswd(args.username, md5passwd(args.password)):
                 authtoken = jwt_encode_token(args.username)
@@ -28,6 +28,6 @@ class Login(Resource):
                                 app.config.get('TOKEN_DEADLINE', 60))
                 return {"code": 0, 'token': authtoken, 'username': args.username}
             else:
-                return {"code": 1, 'message': '用户名或密码错误!!!'}
+                return {"code": 1, 'msg': '用户名或密码错误!!!'}
         except Exception as e:
-            return {"code": 1, 'message': str(e)}
+            return {"code": 1, 'msg': str(e)}

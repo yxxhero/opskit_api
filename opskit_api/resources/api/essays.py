@@ -22,9 +22,9 @@ class Essays(Resource):
                                  default=None, location='args')
         args = self.parser.parse_args()
         try:
-            note_list = Note.query.limit(args.page_size).offset(
+            note_list = Note.query.order_by(Note.create_time.desc()).limit(args.page_size).offset(
                 args.page_size * (args.page - 1)).all()
-            note_infos = [{'href': '/essay/view/?note_id=' + str(item.id), 'content': item.content, 'note_type': item.note_type.value, 'raw_content': item.raw_content, 'title': item.title, 'username': item.user.user_name, 'useravatar': item.user.user_avatar} for item in note_list]
+            note_infos = [{'view_count': item.view_count, 'href': '/essay/view/?note_id=' + str(item.id), 'content': item.content, 'note_type': item.note_type.value, 'raw_content': item.raw_content, 'title': item.title, 'username': item.user.user_name, 'useravatar': item.user.user_avatar} for item in note_list]
         except Exception as e:
             current_app.logger.error(traceback.format_exc())
             return {'code': 1, 'msg': str(e)}

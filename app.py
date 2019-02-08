@@ -10,7 +10,8 @@ from opskit_api.resources.api.upload import Upload
 from opskit_api.resources.auth.login import Login
 from opskit_api.resources.auth.logout import Logout
 from opskit_api.resources.auth.register import Register
-from opskit_api.models import app, db, migrate
+from opskit_api.resources.statistics.recommend import Recommend
+from opskit_api.models import app
 
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
@@ -33,6 +34,15 @@ auth_resource.add_resource(Login, '/login')
 auth_resource.add_resource(Logout, '/logout')
 auth_resource.add_resource(Register, '/register')
 
+# statistics blueprint
+
+statistics_bp = Blueprint('statistics', __name__)
+
+statistics_resource = Api(statistics_bp, catch_all_404s=True)
+
+statistics_resource.add_resource(Recommend, '/recommend')
+
+
 # 拦截请求
 @app.before_request
 def handle_token():
@@ -42,6 +52,7 @@ def handle_token():
 # 注册蓝图
 app.register_blueprint(auth_bp, url_prefix='/api/v1/auth')
 app.register_blueprint(api_bp, url_prefix='/api/v1/resource')
+app.register_blueprint(statistics_bp, url_prefix='/api/v1/statistics')
 
 if __name__ != '__main__':
     gunicorn_logger = logging.getLogger('gunicorn.error')
