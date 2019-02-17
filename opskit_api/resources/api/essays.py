@@ -3,7 +3,6 @@ from flask_restful import reqparse
 from flask import current_app
 from opskit_api.models import Note
 import traceback
-import os
 
 
 class Essays(Resource):

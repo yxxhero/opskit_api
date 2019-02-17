@@ -43,7 +43,7 @@ class Note(db.Model):
         self.title = title
         self.user = user
         self.content = content
-        self.view_count = view_count 
+        self.view_count = view_count
         self.raw_content = raw_content
         self.create_time = datetime.utcnow()
         self.update_time = datetime.utcnow()
@@ -69,10 +69,12 @@ class User(db.Model):
     user_password = db.Column(db.String(100))
     user_email = db.Column(db.String(512))
     user_role = db.Column(ChoiceType(USER_ROLES, impl=db.Integer()), default=1)
+    is_auditing = db.Column(db.Integer, default=0)
     user_avatar = db.Column(db.String(512), default='https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png')
+    user_description = db.Column(db.Text)
     create_time = db.Column(db.DateTime)
 
-    def __init__(self, user_name, user_password, user_email, user_role=1, user_avatar='https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png'):
+    def __init__(self, user_name, user_password, user_email, user_role=1, user_avatar='https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png', is_auditing=0, user_description=""):
 
         super().__init__()
         self.user_name = user_name
@@ -81,6 +83,8 @@ class User(db.Model):
         self.user_role = user_role
         self.user_avatar = user_avatar
         self.create_time = datetime.utcnow()
+        self.is_auditing = is_auditing
+        self.user_description = user_description
 
     def save(self):
         db.session.add(self)
