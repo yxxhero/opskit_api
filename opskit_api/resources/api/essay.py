@@ -8,21 +8,25 @@ from opskit_api.common.login_helper import auth_decorator
 
 class Essay(Resource):
 
-    method_decorators = {'post': [auth_decorator]}
+    method_decorators = {
+        'post': [auth_decorator],
+        'put': [auth_decorator],
+        'delete': [auth_decorator]
+    }
 
     def __init__(self):
         super().__init__()
         self.parser = reqparse.RequestParser(bundle_errors=True)
 
     def get(self):
-        self.parser.add_argument('id', type=str,
-                                 default=None, location='args')
+        self.parser.add_argument('id', type=str, required=True, location='args')
         args = self.parser.parse_args()
         try:
             note_ins = Note.query.filter_by(id=args.id).first()
             if note_ins:
                 note_info = {
                     "title": note_ins.title,
+                    "note_type": note_ins.note_type.code,
                     "content": note_ins.content,
                     "view_count": note_ins.view_count,
                     "raw_content": note_ins.raw_content,
@@ -35,7 +39,7 @@ class Essay(Resource):
                 note_ins.update()
             else:
                 return {'code': 1, 'msg': "文章不存在"}
-        except Exception as e:
+        except Exception:
             current_app.logger.error(traceback.format_exc())
             return {'code': 1, 'msg': '获取文章信息异常'}
         else:
@@ -54,10 +58,63 @@ class Essay(Resource):
         username = g.username
         try:
             user = User.query.filter_by(user_name=username).first()
-            args.user = user
-            Note(**args).save()
+            if user.is_auditing:
+                args.user = user
+                Note(**args).save()
+            else:
+                return {'code': 1, 'msg': '账户未审核'}
         except Exception as e:
             current_app.logger.error(traceback.format_exc())
             return {'code': 1, 'msg': str(e)}
         else:
             return {'code': 0, 'msg': "提交成功"}
+
+    def put(self):
+        self.parser.add_argument(
+            'id', type=str, required=True, location='json')
+        self.parser.add_argument(
+            'title', type=str, required=True, location='json')
+        self.parser.add_argument(
+            'content', type=str, required=True, location='json')
+        self.parser.add_argument(
+            'raw_content', type=str, required=True, location='json')
+        self.parser.add_argument(
+            'note_type', type=int, required=True, location='json')
+        args = self.parser.parse_args()
+        username = g.username
+        try:
+            user = User.query.filter_by(user_name=username).first()
+            note_ins = Note.query.filter_by(user=user, id=args.id).first()
+            if note_ins:
+                note_ins.title = args.title
+                note_ins.content = args.content
+                note_ins.raw_content = args.raw_content
+                note_ins.note_type = args.note_type
+                note_ins.update()
+            else:
+                return {'code': 1, 'msg': '无权限修改此文章'}
+
+        except Exception as e:
+            current_app.logger.error(traceback.format_exc())
+            return {'code': 1, 'msg': str(e)}
+        else:
+            return {'code': 0, 'msg': "提交成功"}
+
+    def delete(self):
+        self.parser.add_argument(
+            'id', type=str, required=True, location='json')
+        args = self.parser.parse_args()
+        username = g.username
+        try:
+            user = User.query.filter_by(user_name=username).first()
+            note_ins = Note.query.filter_by(user=user, id=args.id).first()
+            if note_ins:
+                note_ins.remove()
+            else:
+                return {'code': 1, 'msg': '无权限删除此文章'}
+
+        except Exception as e:
+            current_app.logger.error(traceback.format_exc())
+            return {'code': 1, 'msg': str(e)}
+        else:
+            return {'code': 0, 'msg': '文章删除成功'}

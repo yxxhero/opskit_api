@@ -26,6 +26,7 @@ class Note(db.Model):
 
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     view_count = db.Column(db.Integer, default=0)
+    is_public = db.Column(db.Boolean, default=False)
     title = db.Column(db.String(256))
     content = db.Column(db.Text)
     raw_content = db.Column(db.Text)
@@ -36,7 +37,7 @@ class Note(db.Model):
     user = db.relationship(
         'User', backref=db.backref('note_set', lazy='dynamic'))
 
-    def __init__(self, title, content, raw_content, note_type, user, view_count=0):
+    def __init__(self, title, content, raw_content, note_type, user, view_count=0, is_public=False):
 
         super().__init__()
         self.note_type = note_type
@@ -44,6 +45,7 @@ class Note(db.Model):
         self.user = user
         self.content = content
         self.view_count = view_count
+        self.is_public = is_public
         self.raw_content = raw_content
         self.create_time = datetime.utcnow()
         self.update_time = datetime.utcnow()
@@ -55,13 +57,18 @@ class Note(db.Model):
     def update(self):
         db.session.commit()
 
+    def remove(self):
+        db.session.delete(self)
+        db.session.commit()
+
 
 class User(db.Model):
     __tablename__ = "user"
 
     USER_ROLES = [
-        (0, 'vip'),
+        (0, 'Admin'),
         (1, 'Common'),
+        (2, 'Vip'),
     ]
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -69,12 +76,12 @@ class User(db.Model):
     user_password = db.Column(db.String(100))
     user_email = db.Column(db.String(512))
     user_role = db.Column(ChoiceType(USER_ROLES, impl=db.Integer()), default=1)
-    is_auditing = db.Column(db.Integer, default=0)
+    is_auditing = db.Column(db.Boolean, default=False)
     user_avatar = db.Column(db.String(512), default='https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png')
     user_description = db.Column(db.Text)
     create_time = db.Column(db.DateTime)
 
-    def __init__(self, user_name, user_password, user_email, user_role=1, user_avatar='https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png', is_auditing=0, user_description=""):
+    def __init__(self, user_name, user_password, user_email, user_role=1, user_avatar='https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png', is_auditing=False, user_description=""):
 
         super().__init__()
         self.user_name = user_name
@@ -91,4 +98,8 @@ class User(db.Model):
         db.session.commit()
 
     def update(self):
+        db.session.commit()
+
+    def remove(self):
+        db.session.delete(self)
         db.session.commit()
