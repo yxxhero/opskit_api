@@ -1,20 +1,13 @@
 """empty message
 
-Revision ID: 4313a24e6888
+Revision ID: d99666e22c6e
 Revises: 
-Create Date: 2019-01-26 14:05:33.442585
+Create Date: 2019-03-03 22:56:24.674652
 
 """
 from alembic import op
 import sqlalchemy as sa
 import sqlalchemy_utils
-
-
-# revision identifiers, used by Alembic.
-revision = '4313a24e6888'
-down_revision = None
-branch_labels = None
-depends_on = None
 
 NOTE_TYPES = [
     (1, 'database'),
@@ -24,9 +17,16 @@ NOTE_TYPES = [
 ]
 
 USER_ROLES = [
-    (0, 'vip'),
-    (1, 'Common'),
+    (1, 'Admin'),
+    (2, 'Common'),
+    (3, 'Vip')
 ]
+
+# revision identifiers, used by Alembic.
+revision = 'd99666e22c6e'
+down_revision = None
+branch_labels = None
+depends_on = None
 
 
 def upgrade():
@@ -36,18 +36,25 @@ def upgrade():
     sa.Column('user_name', sa.String(length=100), nullable=True),
     sa.Column('user_password', sa.String(length=100), nullable=True),
     sa.Column('user_email', sa.String(length=512), nullable=True),
-    sa.Column('user_role', sqlalchemy_utils.types.choice.ChoiceType(NOTE_TYPES, impl=sa.Integer()), nullable=True),
+    sa.Column('user_role', sqlalchemy_utils.types.choice.ChoiceType(USER_ROLES, impl=sa.Integer()), nullable=True),
+    sa.Column('is_auditing', sa.Boolean(), nullable=True),
+    sa.Column('user_avatar', sa.String(length=512), nullable=True),
+    sa.Column('user_description', sa.Text(), nullable=True),
     sa.Column('create_time', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('user_name')
     )
     op.create_table('note',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('view_count', sa.Integer(), nullable=True),
+    sa.Column('is_public', sa.Boolean(), nullable=True),
     sa.Column('title', sa.String(length=256), nullable=True),
     sa.Column('content', sa.Text(), nullable=True),
-    sa.Column('note_type', sqlalchemy_utils.types.choice.ChoiceType(USER_ROLES, impl=sa.Integer()), nullable=True),
+    sa.Column('raw_content', sa.Text(), nullable=True),
+    sa.Column('note_type', sqlalchemy_utils.types.choice.ChoiceType(NOTE_TYPES, impl=sa.Integer()), nullable=True),
     sa.Column('userId', sa.Integer(), nullable=True),
     sa.Column('create_time', sa.DateTime(), nullable=True),
+    sa.Column('update_time', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['userId'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )

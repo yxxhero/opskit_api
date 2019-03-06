@@ -70,3 +70,21 @@ def auth_decorator(func):
                 current_app.logger.error(traceback.format_exc())
                 return {'code': 401, 'message': 'token解析异常', 'data': str(e)}, 401
     return wrapper
+
+
+def common_decorator(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if 'Authorization' not in request.headers:
+            g.username = None
+        else:
+            try:
+                username = jwt_decode_token(request.headers.get('Authorization'))['data']['username']
+                if redis_store.get(username).decode('utf-8') != request.headers.get('Authorization'):
+                    g.username = None
+                else:
+                    g.username = username
+            except Exception:
+                g.username = None
+        return func(*args, **kwargs)
+    return wrapper

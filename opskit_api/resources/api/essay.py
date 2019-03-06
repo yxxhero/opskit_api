@@ -3,7 +3,7 @@ from flask_restful import reqparse
 from flask import g, current_app
 from opskit_api.models import Note, User
 import traceback
-from opskit_api.common.login_helper import auth_decorator
+from opskit_api.common.login_helper import auth_decorator, common_decorator
 
 
 class Essay(Resource):
@@ -11,6 +11,7 @@ class Essay(Resource):
     method_decorators = {
         'post': [auth_decorator],
         'put': [auth_decorator],
+        'get': [common_decorator],
         'delete': [auth_decorator]
     }
 
@@ -24,19 +25,40 @@ class Essay(Resource):
         try:
             note_ins = Note.query.filter_by(id=args.id).first()
             if note_ins:
-                note_info = {
-                    "title": note_ins.title,
-                    "note_type": note_ins.note_type.code,
-                    "content": note_ins.content,
-                    "view_count": note_ins.view_count,
-                    "raw_content": note_ins.raw_content,
-                    "username": note_ins.user.user_name,
-                    "useravatar": note_ins.user.user_avatar,
-                    "createtime": note_ins.create_time,
-                    "updatetime": note_ins.update_time
-                }
-                note_ins.view_count += 1
-                note_ins.update()
+                if note_ins.is_public:
+                    note_info = {
+                        "title": note_ins.title,
+                        "note_type": note_ins.note_type.code,
+                        "content": note_ins.content,
+                        "view_count": note_ins.view_count,
+                        "raw_content": note_ins.raw_content,
+                        "username": note_ins.user.user_name,
+                        "useravatar": note_ins.user.user_avatar,
+                        "createtime": note_ins.create_time,
+                        "updatetime": note_ins.update_time
+                    }
+                    note_ins.view_count += 1
+                    note_ins.update()
+                else:
+                    if g.username:
+                        user = User.query.filter_by(user_name=g.username).first()
+                        note_ins = Note.query.filter_by(user=user, id=args.id).first()
+                        if note_ins:
+                            note_info = {
+                                "title": note_ins.title,
+                                "note_type": note_ins.note_type.code,
+                                "content": note_ins.content,
+                                "view_count": note_ins.view_count,
+                                "raw_content": note_ins.raw_content,
+                                "username": note_ins.user.user_name,
+                                "useravatar": note_ins.user.user_avatar,
+                                "createtime": note_ins.create_time,
+                                "updatetime": note_ins.update_time
+                            }
+                        else:
+                            return {'code': 1, 'msg': "没有权限查看"}
+                    else:
+                        return {'code': 1, 'msg': "文章不存在或重新登录"}
             else:
                 return {'code': 1, 'msg': "文章不存在"}
         except Exception:

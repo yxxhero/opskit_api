@@ -66,9 +66,9 @@ class User(db.Model):
     __tablename__ = "user"
 
     USER_ROLES = [
-        (0, 'Admin'),
-        (1, 'Common'),
-        (2, 'Vip'),
+        (1, 'Admin'),
+        (2, 'Common'),
+        (3, 'Vip')
     ]
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -81,7 +81,7 @@ class User(db.Model):
     user_description = db.Column(db.Text)
     create_time = db.Column(db.DateTime)
 
-    def __init__(self, user_name, user_password, user_email, user_role=1, user_avatar='https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png', is_auditing=False, user_description=""):
+    def __init__(self, user_name, user_password, user_email, user_role=2, user_avatar='https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png', is_auditing=False, user_description=""):
 
         super().__init__()
         self.user_name = user_name

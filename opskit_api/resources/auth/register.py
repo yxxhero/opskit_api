@@ -2,7 +2,7 @@ from flask_restful import Resource
 from flask_restful import reqparse
 from opskit_api.common.paasswordmd5 import md5passwd
 from opskit_api.common.login_helper import checkuserexist
-from opskit_api.models import User, db
+from opskit_api.models import User
 
 
 class Register(Resource):
@@ -20,11 +20,11 @@ class Register(Resource):
         args = self.parser.parse_args()
         try:
             if checkuserexist(args.username):
-                return {"code": 1, 'message': '用户名已经存在'}
+                return {"code": 1, 'msg': '用户名已经存在'}
             user = User(user_name=args.username, user_password=md5passwd(
                 args.password), user_email=args.email)
             user.save()
         except Exception as e:
-            return {"code": 1, 'message': str(e)}
+            return {"code": 1, 'msg': str(e)}
         else:
-            return {"code": 0, 'message': '注册成功'}
+            return {"code": 0, 'msg': '注册成功'}

@@ -23,10 +23,19 @@ class UserEssays(Resource):
         try:
             user = User.query.filter_by(user_name=username).first()
             usernotetotal = Note.query.filter_by(user=user).count()
-            note_list = Note.query.filter_by(user=user).order_by(Note.create_time.desc()).limit(args.page_size).offset(
-                args.page_size * (args.page - 1)).all()
-            note_infos = [{'is_public': item.is_public, 'id': item.id, 'update_time': item.update_time, 'view_count': item.view_count, 'href': '/essay/view/?note_id=' + str(
-                item.id), 'content': item.content, 'note_type': item.note_type.value, 'raw_content': item.raw_content, 'title': item.title, 'username': item.user.user_name, 'useravatar': item.user.user_avatar} for item in note_list]
+            note_list = Note.query.filter_by(user=user).order_by(Note.create_time.desc()).limit(args.page_size).offset(args.page_size * (args.page - 1)).all()
+            note_infos = [{
+                'is_public': item.is_public,
+                'id': item.id,
+                'update_time': item.update_time,
+                'view_count': item.view_count,
+                'href': '/essay/view/?note_id=' + str(item.id),
+                'content': item.content,
+                'note_type': item.note_type.value,
+                'raw_content': item.raw_content,
+                'title': item.title,
+                'username': item.user.user_name,
+                'useravatar': item.user.user_avatar} for item in note_list]
         except Exception as e:
             current_app.logger.error(traceback.format_exc())
             return {'code': 1, 'msg': str(e)}
