@@ -27,7 +27,6 @@ class AdminNote(Resource):
             args = self.parser.parse_args()
             username = g.username
             is_public = True if args.is_public == 1 else False
-            current_app.logger.info(is_public)
             user_ins = User.query.filter_by(user_name=username).first()
             if user_ins and user_ins.user_role.code == 1:
                 if args.keyword and args.is_public == None:

@@ -28,9 +28,10 @@ class Essay(Resource):
                 if note_ins.is_public:
                     note_info = {
                         "title": note_ins.title,
-                        "note_type": note_ins.note_type.code,
+                        "note_type": note_ins.note_type.value,
                         "content": note_ins.content,
                         "view_count": note_ins.view_count,
+                        "comment_count": note_ins.note_comments.count(),
                         "raw_content": note_ins.raw_content,
                         "username": note_ins.user.user_name,
                         "useravatar": note_ins.user.user_avatar,
@@ -46,9 +47,10 @@ class Essay(Resource):
                         if note_ins:
                             note_info = {
                                 "title": note_ins.title,
-                                "note_type": note_ins.note_type.code,
+                                "note_type": note_ins.note_type.value,
                                 "content": note_ins.content,
                                 "view_count": note_ins.view_count,
+                                "comment_count": note_ins.note_comments.count(),
                                 "raw_content": note_ins.raw_content,
                                 "username": note_ins.user.user_name,
                                 "useravatar": note_ins.user.user_avatar,

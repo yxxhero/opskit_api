@@ -14,6 +14,34 @@ migrate = Migrate(app, db)
 # model
 
 
+class Comment(db.Model):
+    __tablename__ = 'comment'
+
+    id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
+    prase_count = db.Column(db.Integer, default=0)
+    state = db.Column(db.Integer, default=0)
+    content = db.Column(db.Text)
+    userId = db.Column(db.Integer, db.ForeignKey('user.id'))
+    noteId = db.Column(db.Integer, db.ForeignKey('note.id'))
+    create_time = db.Column(db.DateTime)
+    update_time = db.Column(db.DateTime)
+    user = db.relationship(
+        'User', backref=db.backref('user_comments', lazy='dynamic'))
+    note = db.relationship(
+        'Note', backref=db.backref('note_comments', lazy='dynamic'))
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def update(self):
+        db.session.commit()
+
+    def remove(self):
+        db.session.delete(self)
+        db.session.commit()
+
+
 class Note(db.Model):
     __tablename__ = 'note'
 
