@@ -7,6 +7,8 @@ __pycache__/
 *.so
 *.pid
 *.swp
+*.jpg
+*.JPG
 
 # Distribution / packaging
 .Python

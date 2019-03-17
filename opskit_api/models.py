@@ -14,6 +14,28 @@ migrate = Migrate(app, db)
 # model
 
 
+class Uploads(db.Model):
+    __tablename__ = 'upload'
+
+    id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
+    userId = db.Column(db.Integer, db.ForeignKey('user.id'))
+    create_time = db.Column(db.DateTime)
+    image_path = db.Column(db.String(256))
+    user = db.relationship(
+        'User', backref=db.backref('user_images', lazy='dynamic'))
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def update(self):
+        db.session.commit()
+
+    def remove(self):
+        db.session.delete(self)
+        db.session.commit()
+
+
 class Comment(db.Model):
     __tablename__ = 'comment'
 

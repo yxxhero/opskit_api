@@ -1,4 +1,4 @@
-from opskit_api.models import User, app, redis_store
+from opskit_api.models import User, redis_store
 from flask import request, g, current_app
 from functools import wraps
 import time
@@ -25,7 +25,7 @@ def checkuserexist(username):
 def jwt_encode_token(username):
     login_time = time.time()
     payload = {
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=app.config.get('TOKEN_DEADLINE', 60)),
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=current_app.config.get('TOKEN_DEADLINE', 60)),
         'iat': datetime.datetime.utcnow(),
         'iss': 'ken',
         'data': {
@@ -35,7 +35,7 @@ def jwt_encode_token(username):
     }
     return jwt.encode(
         payload,
-        app.config['SECRET_KEY'],
+        current_app.config['SECRET_KEY'],
         algorithm='HS256'
     ).decode('utf-8')
 
@@ -43,7 +43,7 @@ def jwt_encode_token(username):
 def jwt_decode_token(jwttoken):
     return jwt.decode(
         jwttoken,
-        app.config['SECRET_KEY']
+        current_app.config['SECRET_KEY']
     )
 
 
@@ -87,4 +87,22 @@ def common_decorator(func):
             except Exception:
                 g.username = None
         return func(*args, **kwargs)
+    return wrapper
+
+
+def userinfo_decorator(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if 'Authorization' not in request.headers:
+            return {'code': 401, 'message': '认证信息过期或异常'}
+        else:
+            try:
+                username = jwt_decode_token(request.headers.get('Authorization'))['data']['username']
+                if redis_store.get(username).decode('utf-8') != request.headers.get('Authorization'):
+                    g.username = username
+                    return func(*args, **kwargs)
+                else:
+                    return {'code': 401, 'message': '认证信息过期或异常'}
+            except Exception:
+                return {'code': 401, 'message': '认证信息过期或异常'}
     return wrapper

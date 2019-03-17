@@ -1,6 +1,6 @@
 from flask_restful import Resource, reqparse
 from flask import g, current_app
-from opskit_api.models import Note, User
+from opskit_api.models import Note, User, Comment
 import traceback
 from opskit_api.common.login_helper import auth_decorator
 
@@ -94,3 +94,30 @@ class AdminNote(Resource):
             return {'code': 1, 'msg': '更新文章信息异常'}
         else:
             return {'code': 0, 'msg': "更新成功"}
+
+    def delete(self):
+
+        self.parser.add_argument(
+            'id', type=str, required=True, location='json')
+        args = self.parser.parse_args()
+        try:
+            username = g.username
+            admin_user = User.query.filter_by(user_name=username).first()
+            if admin_user and admin_user.user_role.code == 1:
+                note_ins = Note.query.filter_by(
+                    id=args.id).first()
+                if note_ins:
+                    comment_list = Comment.query.filter_by(note=note_ins).all()
+                    
+                    for item in comment_list:
+                        item.remove()
+                    note_ins.remove()
+                else:
+                    return {'code': 1, 'msg': "文章不存在"}
+            else:
+                return {'code': 1, 'msg': "无权限操作"}
+        except Exception:
+            current_app.logger.error(traceback.format_exc())
+            return {'code': 1, 'msg': '删除文章异常'}
+        else:
+            return {'code': 0, 'msg': "删除成功"}
