@@ -13,7 +13,8 @@ NOTE_TYPES = [
     (1, 'database'),
     (2, 'web'),
     (3, 'docker'),
-    (4, 'security')
+    (4, 'security'),
+    (5, 'notice')
 ]
 
 USER_ROLES = [

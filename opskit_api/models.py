@@ -71,7 +71,8 @@ class Note(db.Model):
         (1, 'database'),
         (2, 'web'),
         (3, 'docker'),
-        (4, 'security')
+        (4, 'security'),
+        (5, 'notice')
     ]
 
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)

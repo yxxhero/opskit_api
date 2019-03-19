@@ -5,6 +5,7 @@ import logging
 
 # 引入视图函数
 from opskit_api.resources.api.essays import Essays
+from opskit_api.resources.api.notices import Notices 
 from opskit_api.resources.api.useressays import UserEssays
 from opskit_api.resources.api.essay import Essay
 from opskit_api.resources.api.upload import Upload
@@ -28,6 +29,7 @@ api_bp = Blueprint('api', __name__)
 api_resource = Api(api_bp, catch_all_404s=True)
 
 api_resource.add_resource(Essays, '/notes')
+api_resource.add_resource(Notices, '/notices')
 api_resource.add_resource(UserEssays, '/usernotes')
 api_resource.add_resource(Essay, '/note')
 api_resource.add_resource(Upload, '/upload')
