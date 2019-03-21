@@ -28,7 +28,7 @@ class Essay(Resource):
                 if note_ins.is_public:
                     note_info = {
                         "title": note_ins.title,
-                        "note_type": note_ins.note_type.value,
+                        "note_type": note_ins.note_type.code,
                         "content": note_ins.content,
                         "view_count": note_ins.view_count,
                         "comment_count": note_ins.note_comments.count(),
@@ -82,6 +82,8 @@ class Essay(Resource):
         username = g.username
         try:
             user = User.query.filter_by(user_name=username).first()
+            current_app.logger.info(args.raw_content)
+            current_app.logger.info(args.content)
             if user.is_auditing:
                 args.user = user
                 Note(**args).save()
