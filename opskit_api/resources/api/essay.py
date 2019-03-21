@@ -104,9 +104,9 @@ class Essay(Resource):
             'raw_content', type=str, required=True, location='json')
         self.parser.add_argument(
             'note_type', type=int, required=True, location='json')
-        args = self.parser.parse_args()
-        username = g.username
         try:
+            args = self.parser.parse_args()
+            username = g.username
             user = User.query.filter_by(user_name=username).first()
             note_ins = Note.query.filter_by(user=user, id=args.id).first()
             if note_ins:
