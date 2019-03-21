@@ -47,7 +47,7 @@ class Essay(Resource):
                         if note_ins:
                             note_info = {
                                 "title": note_ins.title,
-                                "note_type": note_ins.note_type.value,
+                                "note_type": note_ins.note_type.code,
                                 "content": note_ins.content,
                                 "view_count": note_ins.view_count,
                                 "comment_count": note_ins.note_comments.count(),
