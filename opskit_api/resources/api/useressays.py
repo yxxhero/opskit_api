@@ -29,6 +29,7 @@ class UserEssays(Resource):
                 'id': item.id,
                 'update_time': item.update_time,
                 'view_count': item.view_count,
+                'comment_count': item.note_comments.count(),
                 'href': '/essay/view/?note_id=' + str(item.id),
                 'content': item.content,
                 'note_type': item.note_type.value,
