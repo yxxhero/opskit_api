@@ -7,7 +7,7 @@ from opskit_api.common.login_helper import auth_decorator
 
 class UserInfo(Resource):
 
-    method_decorators = {'put': [auth_decorator]}
+    method_decorators = [auth_decorator]
 
     def __init__(self):
         super().__init__()
