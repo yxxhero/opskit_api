@@ -72,6 +72,7 @@ class Note(db.Model):
         (2, 'web'),
         (3, 'docker'),
         (4, 'security'),
+        (6, 'security'),
         (5, 'notice')
     ]
 
