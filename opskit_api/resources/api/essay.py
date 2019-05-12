@@ -85,6 +85,8 @@ class Essay(Resource):
             current_app.logger.info(args.raw_content)
             current_app.logger.info(args.content)
             if user.is_auditing:
+                if user.user_role.code == 1:
+                    args.is_public = True
                 args.user = user
                 Note(**args).save()
             else:

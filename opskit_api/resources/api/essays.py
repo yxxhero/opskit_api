@@ -8,7 +8,9 @@ NOTE_TYPES = {
     'database': 1,
     'web': 2,
     'docker': 3,
-    'security': 4
+    'security': 4,
+    'notice': 5,
+    'hadoop': 6
 }
 
 

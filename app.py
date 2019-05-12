@@ -10,6 +10,7 @@ from opskit_api.resources.api.useressays import UserEssays
 from opskit_api.resources.api.essay import Essay
 from opskit_api.resources.api.upload import Upload
 from opskit_api.resources.api.userinfo import UserInfo
+from opskit_api.resources.api.noteuserinfo import EssayUserInfo
 from opskit_api.resources.admin.users import AdminUser
 from opskit_api.resources.admin.essays import AdminNote
 from opskit_api.resources.admin.comments import AdminComment
@@ -34,6 +35,7 @@ api_resource.add_resource(UserEssays, '/usernotes')
 api_resource.add_resource(Essay, '/note')
 api_resource.add_resource(Upload, '/upload')
 api_resource.add_resource(UserInfo, '/userinfo')
+api_resource.add_resource(EssayUserInfo, '/noteuserinfo')
 api_resource.add_resource(Comments, '/comments')
 
 # admin blueprint
@@ -76,7 +78,6 @@ search_resource.add_resource(SearchNote, '/notes')
 @app.before_request
 def handle_token():
     pass
-
 
 # 注册蓝图
 app.register_blueprint(auth_bp, url_prefix='/api/v1/auth')

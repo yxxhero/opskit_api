@@ -61,12 +61,22 @@ class Comments(Resource):
                 note = Note.query.filter_by(id=args.id).first()
                 if not note:
                     return {'code': 2, 'msg': '文章不存在'}
-                Comment(user=user, 
-                        note=note, 
-                        update_time=datetime.utcnow(),
-                        create_time=datetime.utcnow(),
-                        content=args.content
-                ).save()
+                if user.user_role.code == 1:
+                    Comment(user=user, 
+                            note=note, 
+                            update_time=datetime.utcnow(),
+                            create_time=datetime.utcnow(),
+                            state = 1,
+                            content=args.content
+                    ).save()
+                else:
+                    Comment(user=user, 
+                            note=note, 
+                            update_time=datetime.utcnow(),
+                            create_time=datetime.utcnow(),
+                            content=args.content
+                    ).save()
+
             else:
                 return {'code': 2, 'msg': '评论前请登录'}
         except Exception as e:
