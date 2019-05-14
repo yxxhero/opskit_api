@@ -24,6 +24,8 @@ class Upload(Resource):
     def post(self):
         self.parser.add_argument(
             'file', type=FileStorage, location='files', required=True)
+        self.parser.add_argument(
+            'is_avatar', type=str, location='form', required=False)
         args = self.parser.parse_args()
         if not allowed_file(args.file.filename):
             return {'code': 1, 'msg': "文件名不合法"}
@@ -40,6 +42,11 @@ class Upload(Resource):
                    image_path=os.path.join(file_dir, md5_filename),
                    create_time=datetime.utcnow()
                   ).save()
+            if args.is_avatar == "1":
+                user=User.query.filter_by(user_name=username).first()
+                user.user_avatar = current_app.config['IMAGE_HOST'] + os.path.join('/uploads/', username, md5_filename) 
+                user.update()
+                
         except Exception as e:
             current_app.logger.error(traceback.format_exc())
             return {'code': 1, 'msg': str(e)}

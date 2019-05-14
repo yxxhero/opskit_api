@@ -16,6 +16,7 @@ class UserEssays(Resource):
 
     def get(self):
         self.parser.add_argument('page', type=int, default=1, location='args')
+        self.parser.add_argument('keyword', type=str, location='args', required=False)
         self.parser.add_argument(
             'page_size', type=int, default=10, location='args')
         args = self.parser.parse_args()
@@ -23,7 +24,10 @@ class UserEssays(Resource):
         try:
             user = User.query.filter_by(user_name=username).first()
             usernotetotal = Note.query.filter_by(user=user).count()
-            note_list = Note.query.filter_by(user=user).order_by(Note.create_time.desc()).limit(args.page_size).offset(args.page_size * (args.page - 1)).all()
+            if args.keyword:
+                note_list = Note.query.filter(Note.title.ilike("%{}%".format(args.keyword)), user == user).order_by(Note.create_time.desc()).limit(args.page_size).offset(args.page_size * (args.page - 1)).all()
+            else:
+                note_list = Note.query.filter_by(user=user).order_by(Note.create_time.desc()).limit(args.page_size).offset(args.page_size * (args.page - 1)).all()
             note_infos = [{
                 'is_public': item.is_public,
                 'id': item.id,
