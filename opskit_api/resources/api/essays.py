@@ -31,11 +31,13 @@ class Essays(Resource):
             if args.note_type:
                 if args.note_type in NOTE_TYPES.keys():
                     note_list = Note.query.filter(Note.is_public == True, Note.note_type == NOTE_TYPES[args.note_type]).order_by(Note.create_time.desc()).limit(args.page_size).offset(args.page_size * (args.page - 1)).all()
+                    note_total = Note.query.filter(Note.is_public == True, Note.note_type == NOTE_TYPES[args.note_type]).count()
                 else:
                     return {'code': 1, 'msg': '类目不存在'}
             else:
                 note_list = Note.query.filter(Note.is_public == True).order_by(Note.create_time.desc()).limit(args.page_size).offset(
                     args.page_size * (args.page - 1)).all()
+                note_total = Note.query.filter(Note.is_public == True).count()
             note_infos = [{
                            'view_count': item.view_count, 
                            'href': '/essay/view/?note_id=' + str(item.id),
@@ -50,4 +52,4 @@ class Essays(Resource):
             current_app.logger.error(traceback.format_exc())
             return {'code': 1, 'msg': str(e)}
         else:
-            return {'code': 0, 'msg': "请求成功", 'data': note_infos}
+            return {'code': 0, 'msg': "请求成功", 'data': note_infos, 'total': note_total}

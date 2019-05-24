@@ -8,7 +8,7 @@ class Recommend(Resource):
 
     def get(self):
         try:
-            note_list = Note.query.order_by(Note.view_count.desc()).limit(10)
+            note_list = Note.query.filter(Note.is_public == True).order_by(Note.view_count.desc()).limit(10)
             recommend_list = [{
                 "href": "/essay/view/?note_id=" + str(note_ins.id),
                 "id": note_ins.id, 
