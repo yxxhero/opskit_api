@@ -133,9 +133,10 @@ class User(db.Model):
     is_auditing = db.Column(db.Boolean, default=False)
     user_avatar = db.Column(db.String(512), default='https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png')
     user_description = db.Column(db.Text)
+    edit_type = db.Column(db.String(50), default="richtext")
     create_time = db.Column(db.DateTime)
 
-    def __init__(self, user_name, user_password, user_email, user_role=2, user_avatar='https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png', is_auditing=False, user_description=""):
+    def __init__(self, user_name, user_password, user_email, user_role=2, edit_type="richtext", user_avatar='https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png', is_auditing=False, user_description=""):
 
         super().__init__()
         self.user_name = user_name
@@ -144,6 +145,7 @@ class User(db.Model):
         self.user_role = user_role
         self.user_avatar = user_avatar
         self.create_time = datetime.now()
+        self.edit_type = edit_type
         self.is_auditing = is_auditing
         self.user_description = user_description
 
