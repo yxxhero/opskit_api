@@ -64,16 +64,16 @@ class Comments(Resource):
                 if user.user_role.code == 1:
                     Comment(user=user, 
                             note=note, 
-                            update_time=datetime.utcnow(),
-                            create_time=datetime.utcnow(),
+                            update_time=datetime.now(),
+                            create_time=datetime.now(),
                             state = 1,
                             content=args.content
                     ).save()
                 else:
                     Comment(user=user, 
                             note=note, 
-                            update_time=datetime.utcnow(),
-                            create_time=datetime.utcnow(),
+                            update_time=datetime.now(),
+                            create_time=datetime.now(),
                             content=args.content
                     ).save()
 

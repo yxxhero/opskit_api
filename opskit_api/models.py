@@ -99,8 +99,8 @@ class Note(db.Model):
         self.view_count = view_count
         self.is_public = is_public
         self.raw_content = raw_content
-        self.create_time = datetime.utcnow()
-        self.update_time = datetime.utcnow()
+        self.create_time = datetime.now()
+        self.update_time = datetime.now()
 
     def save(self):
         db.session.add(self)
@@ -141,7 +141,7 @@ class User(db.Model):
         self.user_email = user_email
         self.user_role = user_role
         self.user_avatar = user_avatar
-        self.create_time = datetime.utcnow()
+        self.create_time = datetime.now()
         self.is_auditing = is_auditing
         self.user_description = user_description
 
