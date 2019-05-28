@@ -86,15 +86,17 @@ class Note(db.Model):
     userId = db.Column(db.Integer, db.ForeignKey('user.id'))
     create_time = db.Column(db.DateTime)
     update_time = db.Column(db.DateTime)
+    edit_type = db.Column(db.String(50), default="richtext")
     user = db.relationship(
         'User', backref=db.backref('note_set', lazy='dynamic'))
 
-    def __init__(self, title, content, raw_content, note_type, user, view_count=0, is_public=False):
+    def __init__(self, title, content, raw_content, note_type, user, edit_type="richtext", view_count=0, is_public=False):
 
         super().__init__()
         self.note_type = note_type
         self.title = title
         self.user = user
+        self.edit_type = edit_type
         self.content = content
         self.view_count = view_count
         self.is_public = is_public
