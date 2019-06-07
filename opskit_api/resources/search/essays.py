@@ -1,6 +1,7 @@
 from flask_restful import Resource, reqparse
 from flask import current_app
 from opskit_api.models import Note
+from sqlalchemy import or_
 import traceback
 
 
@@ -21,9 +22,9 @@ class SearchNote(Resource):
                 'keyword', type=str, required=False, location='args', default=None)
             args = self.parser.parse_args()
             if args.keyword:
-                note_total = Note.query.filter(Note.content.contains(
-                    args.keyword), Note.is_public == True).order_by(Note.update_time.desc()).count()
-                note_ins_list = Note.query.filter(Note.content.contains(args.keyword), Note.is_public == True).order_by(
+                note_total = Note.query.filter(or_(Note.content.contains(
+                    args.keyword), Note.title.contains(args.keyword)), Note.is_public == True).order_by(Note.update_time.desc()).count()
+                note_ins_list = Note.query.filter(or_(Note.content.contains(args.keyword), Note.title.contains(args.keyword)), Note.is_public == True).order_by(
                     Note.update_time.desc()).limit(args.pagesize).offset(args.pagesize * (args.page - 1)).all()
             else:
                 note_total = Note.query.filter(Note.is_public == True).order_by(
