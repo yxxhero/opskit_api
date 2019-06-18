@@ -23,31 +23,36 @@ class AdminUser(Resource):
             self.parser.add_argument(
                 'username', type=str, required=False, location='args', default=None)
             self.parser.add_argument(
-                'is_auditing', type=int, required=False, location='args', default=None)
+                'is_auditing', type=int, required=False, location='args', choices=[0, 1], default=None)
             args = self.parser.parse_args()
             username = g.username
-            is_auditing = True if args.is_auditing else False
+            if args.is_auditing in [0, 1]:
+                is_auditing = True if args.is_auditing else False
+            else:
+                is_auditing = args.is_auditing
             user_ins = User.query.filter_by(user_name=username).first()
             if user_ins and user_ins.user_role.code == 1:
-                if args.username and not is_auditing:
-                    user_total = User.query.filter(User.user_name.contains(args.username)).order_by(
-                        User.create_time.desc()).count()
-                    user_ins_list = User.query.filter(User.user_name.contains(args.username)).order_by(
-                        User.create_time.desc()).limit(args.pagesize).offset(args.pagesize * (args.page - 1)).all()
-                elif is_auditing and not args.username:
-                    user_total = User.query.filter(User.is_auditing == is_auditing).order_by(
-                        User.create_time.desc()).count()
-                    user_ins_list = User.query.filter(User.is_auditing == is_auditing).order_by(
-                        User.create_time.desc()).limit(args.pagesize).offset(args.pagesize * (args.page - 1)).all()
-                elif is_auditing and args.username:
-                    user_total = User.query.filter(User.user_name.contains(args.username), User.is_auditing == is_auditing).order_by(
-                        User.create_time.desc()).count()
-                    user_ins_list = User.query.filter(User.user_name.contains(args.username), User.is_auditing == is_auditing).order_by(
-                        User.create_time.desc()).limit(args.pagesize).offset(args.pagesize * (args.page - 1)).all()
+                if args.username:
+                    if is_auditing is None:
+                        user_total = User.query.filter(User.user_name.contains(args.username)).order_by(
+                            User.create_time.desc()).count()
+                        user_ins_list = User.query.filter(User.user_name.contains(args.username)).order_by(
+                            User.create_time.desc()).limit(args.pagesize).offset(args.pagesize * (args.page - 1)).all()
+                    else:
+                        user_total = User.query.filter(User.user_name.contains(args.username), User.is_auditing == is_auditing).order_by(
+                            User.create_time.desc()).count()
+                        user_ins_list = User.query.filter(User.user_name.contains(args.username), User.is_auditing == is_auditing).order_by(
+                            User.create_time.desc()).limit(args.pagesize).offset(args.pagesize * (args.page - 1)).all()
                 else:
-                    user_total = User.query.order_by(User.create_time.desc()).count()
-                    user_ins_list = User.query.order_by(User.create_time.desc()).limit(
-                        args.pagesize).offset(args.pagesize * (args.page - 1)).all()
+                    if is_auditing is None:
+                        user_total = User.query.order_by(User.create_time.desc()).count()
+                        user_ins_list = User.query.order_by(User.create_time.desc()).limit(
+                            args.pagesize).offset(args.pagesize * (args.page - 1)).all()
+                    else:
+                        user_total = User.query.filter(User.is_auditing == is_auditing).order_by(
+                            User.create_time.desc()).count()
+                        user_ins_list = User.query.filter(User.is_auditing == is_auditing).order_by(
+                            User.create_time.desc()).limit(args.pagesize).offset(args.pagesize * (args.page - 1)).all()
                 user_info_list = [
                     {
                         "username": item.user_name,
