@@ -15,23 +15,33 @@ class Login(Resource):
         self.parser = reqparse.RequestParser(bundle_errors=True)
 
     def post(self):
-        self.parser.add_argument('username', type=str,
-                                 required=True, location='json')
-        self.parser.add_argument('password', type=str,
-                                 required=True, location='json')
+        self.parser.add_argument("username", type=str, required=True, location="json")
+        self.parser.add_argument("password", type=str, required=True, location="json")
         args = self.parser.parse_args()
         try:
             if not checkuserexist(args.username):
-                return {"code": 1, 'msg': '用户名不存在!!!'}
+                return {"code": 1, "msg": "用户名不存在!!!"}
 
             if checkuserpasswd(args.username, md5passwd(args.password)):
-                userrole = User.query.filter_by(user_name=args.username).first().user_role.value
+                userrole = (
+                    User.query.filter_by(user_name=args.username)
+                    .first()
+                    .user_role.value
+                )
                 authtoken = jwt_encode_token(args.username)
-                redis_store.set(args.username, authtoken,
-                                current_app.config.get('TOKEN_DEADLINE', 60))
-                return {"code": 0, 'token': authtoken, 'username': args.username, "userrole": userrole}
+                redis_store.set(
+                    args.username,
+                    authtoken,
+                    current_app.config.get("TOKEN_DEADLINE", 60),
+                )
+                return {
+                    "code": 0,
+                    "token": authtoken,
+                    "username": args.username,
+                    "userrole": userrole,
+                }
             else:
-                return {"code": 1, 'msg': '用户名或密码错误!!!'}
+                return {"code": 1, "msg": "用户名或密码错误!!!"}
         except Exception as e:
             current_app.logger.error(traceback.format_exc())
-            return {"code": 1, 'msg': str(e)}
+            return {"code": 1, "msg": str(e)}

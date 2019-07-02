@@ -27,22 +27,22 @@ class UserInfo(Resource):
                     "useravatar": user_ins.user_avatar,
                     "userdescription": user_ins.user_description,
                     "createtime": user_ins.create_time,
-                    "notecount": user_ins.note_set.count()
+                    "notecount": user_ins.note_set.count(),
                 }
             else:
-                return {'code': 1, 'msg': "无法找到用户信息"}
+                return {"code": 1, "msg": "无法找到用户信息"}
         except Exception:
             current_app.logger.error(traceback.format_exc())
-            return {'code': 1, 'msg': '获取用户信息异常'}
+            return {"code": 1, "msg": "获取用户信息异常"}
         else:
-            return {'code': 0, 'msg': "请求成功", 'data': user_info}
+            return {"code": 0, "msg": "请求成功", "data": user_info}
 
     def put(self):
 
+        self.parser.add_argument("useremail", type=str, required=True, location="json")
         self.parser.add_argument(
-            'useremail', type=str, required=True, location='json')
-        self.parser.add_argument(
-            'userdescription', type=str, required=True, location='json')
+            "userdescription", type=str, required=True, location="json"
+        )
         args = self.parser.parse_args()
         try:
             username = g.username
@@ -52,9 +52,9 @@ class UserInfo(Resource):
                 user_ins.user_description = args.userdescription
                 user_ins.update()
             else:
-                return {'code': 1, 'msg': "无法找到用户信息"}
+                return {"code": 1, "msg": "无法找到用户信息"}
         except Exception:
             current_app.logger.error(traceback.format_exc())
-            return {'code': 1, 'msg': '更新用户信息异常'}
+            return {"code": 1, "msg": "更新用户信息异常"}
         else:
-            return {'code': 0, 'msg': "请求成功"}
+            return {"code": 0, "msg": "请求成功"}

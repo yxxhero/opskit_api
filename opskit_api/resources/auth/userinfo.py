@@ -11,7 +11,7 @@ class UserInfo(Resource):
     def get(self):
         try:
             username = g.username
-            return {'code': 0, 'username': username}
+            return {"code": 0, "username": username}
         except Exception:
             current_app.logger.error(traceback.format_exc())
-            return {'code': 401, 'msg': '认证信息错误'}
+            return {"code": 401, "msg": "认证信息错误"}
