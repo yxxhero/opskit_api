@@ -33,22 +33,33 @@ class Upload(Resource):
             filename = secure_filename(args.file.filename)
             md5_value = md5passwd(filename + str(time.time()))
             md5_filename = md5_value + '.' + filename.split('.')[1]
-            username = g.username
             file_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], username)
-            ensure_userdir_exist(file_dir)
-            args.file.save(os.path.join(file_dir, md5_filename))
-            Uploads(
-                   user=User.query.filter_by(user_name=username).first(),
-                   image_path=os.path.join(file_dir, md5_filename),
-                   create_time=datetime.utcnow()
-                  ).save()
+            username = g.username
             if args.is_avatar == "1":
+                ensure_userdir_exist(file_dir)
+                args.file.save(os.path.join(file_dir, md5_filename))
                 user=User.query.filter_by(user_name=username).first()
+                Uploads(
+                       user=user,
+                       image_path=os.path.join(file_dir, md5_filename),
+                       create_time=datetime.now()
+                      ).save()
                 user.user_avatar = current_app.config['IMAGE_HOST'] + os.path.join('/uploads/', username, md5_filename) 
                 user.update()
-                
+            else:
+                if not (user.user_role.code == 1 or user.is_auditing):
+                    return {'code': 2, 'msg': '无权上传图片'}
+                user=User.query.filter_by(user_name=username).first()
+                file_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], username)
+                ensure_userdir_exist(file_dir)
+                args.file.save(os.path.join(file_dir, md5_filename))
+                Uploads(
+                       user=user,
+                       image_path=os.path.join(file_dir, md5_filename),
+                       create_time=datetime.now()
+                      ).save()
         except Exception as e:
             current_app.logger.error(traceback.format_exc())
-            return {'code': 1, 'msg': str(e)}
+            return {'code': 3, 'msg': str(e)}
         else:
             return {'code': 0, 'url': current_app.config['IMAGE_HOST'] + os.path.join('/uploads/', username, md5_filename), 'msg': "上传文件成功"}
