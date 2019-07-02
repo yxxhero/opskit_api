@@ -70,7 +70,7 @@ class Message(db.Model):
     # 1 read 0 unread
     state = db.Column(db.Integer, default=0)
     # 0 no mean
-    # 1 new user and bug not agre
+    # 1 new user and but not agre
     # 2 new comment but not agree
     # 3 new essay but not agree
     # 4 new essay and agree

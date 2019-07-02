@@ -46,3 +46,18 @@ class UserMessage(Resource):
             return {"code": 1, "msg": "获取消息异常"}
         else:
             return {"code": 0, "msg": "请求成功", "data": msg_list}
+
+    def put(self):
+
+        self.parser.add_argument("id", type=str, required=True, location="json")
+        args = self.parser.parse_args()
+        try:
+            user = User.query.filter_by(user_name=g.username).first()
+            msgs = Message.query.filter_by(user=user, id=args.id).first()
+            msgs.state = 1
+            msgs.save()
+        except Exception:
+            current_app.logger.error(traceback.format_exc())
+            return {"code": 1, "msg": "处理消息异常"}
+        else:
+            return {"code": 0, "msg": "请求成功"}
