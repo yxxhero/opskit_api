@@ -13,6 +13,7 @@ from opskit_api.resources.api.essay import Essay
 
 # 引入视图函数
 from opskit_api.resources.api.essays import Essays
+from opskit_api.resources.message.message import UserMessage
 from opskit_api.resources.api.noteuserinfo import EssayUserInfo
 from opskit_api.resources.api.notices import Notices
 from opskit_api.resources.api.upload import Upload
@@ -39,6 +40,7 @@ api_resource.add_resource(Upload, "/upload")
 api_resource.add_resource(UserInfo, "/userinfo")
 api_resource.add_resource(EssayUserInfo, "/noteuserinfo")
 api_resource.add_resource(Comments, "/comments")
+api_resource.add_resource(UserMessage, "/messages")
 
 # admin blueprint
 admin_bp = Blueprint("admin", __name__)
@@ -88,6 +90,7 @@ app.register_blueprint(search_bp, url_prefix="/api/v1/search")
 app.register_blueprint(admin_bp, url_prefix="/api/v1/admin")
 app.register_blueprint(api_bp, url_prefix="/api/v1/resource")
 app.register_blueprint(statistics_bp, url_prefix="/api/v1/statistics")
+app.register_blueprint(message_bp, url_prefix="/api/v1/message")
 
 if __name__ != "__main__":
     gunicorn_logger = logging.getLogger("gunicorn.error")
