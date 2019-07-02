@@ -1,11 +1,13 @@
-from opskit_api.models import User, redis_store
-from flask import request, g, current_app
-from functools import wraps
-import time
 import datetime
+import time
 import traceback
-from jwt.exceptions import InvalidTokenError, ExpiredSignatureError
+from functools import wraps
+
+from flask import current_app, g, request
+
 import jwt
+from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
+from opskit_api.models import User, redis_store
 
 
 def checkuserpasswd(username, password):
