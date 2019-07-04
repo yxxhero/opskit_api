@@ -11,6 +11,10 @@ NOTE_TYPES = {
     "security": 4,
     "notice": 5,
     "hadoop": 6,
+    "opsai": 7,
+    "opsbase": 8,
+    "opsskill": 9,
+    "opsframework": 10,
 }
 
 

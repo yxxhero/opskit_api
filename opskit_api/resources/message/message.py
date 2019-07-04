@@ -18,6 +18,12 @@ class UserMessage(Resource):
         self.parser.add_argument(
             "state", type=str, required=False, default="all", location="args"
         )
+        self.parser.add_argument(
+            "page", type=int, required=True, default=1, location="args"
+        )
+        self.parser.add_argument(
+            "page_size", type=int, required=False, default=10, location="args"
+        )
         args = self.parser.parse_args()
         try:
             msg_list = []
@@ -28,7 +34,7 @@ class UserMessage(Resource):
             if args.state == "all":
                 msgs = Message.query.filter_by(user=user).all()
             else:
-                msgs = Message.query.filter_by(user=user, state=int(args.state)).all()
+                msgs = Message.query.filter_by(user=user, state=int(args.state)).order_by(Message.create_time.desc()).limit(args.page_size).offset(args.page_size * (args.page - 1)).all()
 
             for item in msgs:
                 msg_list.append(
@@ -41,11 +47,12 @@ class UserMessage(Resource):
                         "createtime": item.create_time,
                     }
                 )
+            end = True if msgs else False
         except Exception:
             current_app.logger.error(traceback.format_exc())
             return {"code": 1, "msg": "获取消息异常"}
         else:
-            return {"code": 0, "msg": "请求成功", "data": msg_list}
+            return {"code": 0, "msg": "请求成功", "data": msg_list, "end": end}
 
     def put(self):
 
