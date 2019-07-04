@@ -105,6 +105,10 @@ class Note(db.Model):
         (4, "security"),
         (6, "hadoop"),
         (5, "notice"),
+        (7, "opsai"),
+        (8, "opsbase"),
+        (9, "opsskill"),
+        (10, "opsframework"),
     ]
 
     id = db.Column("id", db.Integer, primary_key=True, autoincrement=True)
